@@ -22,29 +22,31 @@
 
 <?php
 // define variables and set to empty values
-$fnameErr = $lnameErr = $phoneErr = $emailErr = $userErr = $passErr = $genderErr =  "";
-$fname = $lname = $phone = $email = $username = $password = "";
+$nameErr = $birthErr = $genderErr = $phoneErr = $emailErr = "";
+$name = $birth = $gender = $phone = $email = "";
 $valid = 0;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (empty($_POST["fname"])) {
-    $fnameErr = "Firstname is required";
+  if (empty($_POST["name"])) {
+    $nameErr = "Name is required";
   } else {
-    $fname = test_input($_POST["fname"]);
+    $name = test_input($_POST["name"]);
     // check if name only contains letters and whitespace
-    if (!preg_match("/^[a-zA-Z ]*$/",$fname)) {
-      $fnameErr = "Only letters and white space allowed"; 
+    if (!preg_match("/^[a-zA-Z ]*$/",$name)) {
+      $nameErr = "Only letters and white space allowed"; 
     }
   }
   
-  if (empty($_POST["lname"])) {
-    $lnameErr = "Lastname is required";
+  if (empty($_POST["birth"])) {
+    $birthErr = "Birthday is required";
   } else {
-    $lname = test_input($_POST["lname"]);
-    // check if name only contains letters and whitespace
-    if (!preg_match("/^[a-zA-Z ]*$/",$lname)) {
-      $lnameErr = "Only letters and white space allowed"; 
-    }
+    $birth = test_input($_POST["birth"]);
+  }
+  
+  if (empty($_POST["gender"])) {
+    $genderErr = "Gender is required";
+  } else {
+    $gender = test_input($_POST["gender"]);
   }
   
   if (empty($_POST["phone"])) {
@@ -67,24 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
   
-  if (empty($_POST["username"])) {
-    $userErr = "Username is required";
-  } else {
-    $username = test_input($_POST["username"]);
-    // check if name only contains letters and whitespace
-    if (!preg_match("/^[a-zA-Z0-9_]*$/",$username)) {
-      $userErr = "Username cant have special characters"; 
-    }
-  }
-  
-  if (empty($_POST["password"])) {
-    $passErr = "Password is required";
-  } else {
-    $password = test_input($_POST["password"]);
-    // check password
-  }
-  
-  if (empty($fnameErr) && empty($lnameErr) && empty($phoneErr) && empty($emailErr) && empty($userErr) && empty($passErr)){
+  if (empty($nameErr) && empty($birthErr) && empty($genderErr) && empty($phoneErr) && empty($emailErr)){
 	  $valid = 1;
   }
 }
@@ -95,36 +80,50 @@ function test_input($data) {
   $data = htmlspecialchars($data);
   return $data;
 }
-require('database/connect.php');
 if($valid){
-  $query = "INSERT INTO users(first_name, last_name, phone, email, username, password) VALUES ('" . $fname . "','" . $lname . "','" . $phone . "','" . $email . "','" . $username . "','" . $password . "')";
-  mysqli_query($conn,$query);
-  mysqli_close($conn);
+  $data = $name . "," . $birth . "," . $gender . "," . $phone . "," . $email . "\n";
+  file_put_contents("list_persion.csv", $data, FILE_APPEND);
+  echo '<div class="alert alert-success" role="alert"><strong>Succeeded!</strong> Add 1 people to list</div>';
 }
-
 ?>
 <div class="container">
   <div class="row">
     <div class="col-md-8 col-md-offset-2 panel-login">
       <div class="panel panel-default ">
-        <div class="panel-heading"><h2>Register</h2></div>
+        <div class="panel-heading"><h2>Add new people</h2></div>
 		  <p><span class="red" role="alert">* required field.</span></p>
         <div class="panel-body">
           <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 	        <div class="form-group">
-              <label for="fnameInput" class="col-md-4 control-label">First Name: </label>
+              <label for="nameInput" class="col-md-4 control-label">Name: </label>
 			    <div class="col-md-6">
-                  <input id="fnameInput" type="text" class="form-control" placeholder="Enter first name" name="fname" value="<?php echo $fname;?>" maxlength="100">
+                  <input id="nameInput" type="text" class="form-control" placeholder="Enter name" name="name" value="<?php echo $name;?>" maxlength="100">
                 </div>
-	          <span class="red" role="alert">* <?php echo $fnameErr;?></span>
+	          <span class="red" role="alert">* <?php echo $nameErr;?></span>
             </div>
-			<div class="form-group">
-              <label for="lnameInput" class="col-md-4 control-label">Last Name: </label>
+	        <div class="form-group">
+              <label for="birthInput" class="col-md-4 control-label">Birhday: </label>
 			    <div class="col-md-6">
-                  <input id="lnameInput" type="text" class="form-control" placeholder="Enter last name" name="lname" value="<?php echo $lname;?>" maxlength="100">
+                  <input id="nameInput" type="date" class="form-control" name="birth" value="<?php echo $birth;?>">
                 </div>
-	          <span class="red" role="alert">* <?php echo $lnameErr;?></span>
+	          <span class="red" role="alert">* <?php echo $nameErr;?></span>
             </div>
+    	    <fieldset class="form-group">
+              <legend class="col-md-4 control-label">Gender:</legend>
+			    <div class="col-md-6">
+                  <div class="form-check">
+					<label class="form-check-label">
+                      <input type="radio" class="form-check-input" name="gender" <?php if (isset($gender) && $gender=="Nam") echo "checked";    ?> value="Nam">Nam
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" name="gender" <?php if (isset($gender) && $gender=="Nữ") echo "checked";    ?> value="Nữ">Nữ
+                    </label>
+                  </div>
+				</div>
+	    	    <span class="red" role="alert">* <?php echo $genderErr;?></span>
+            </fieldset>
             <div class="form-group">
               <label for="phoneInput" class="col-md-4 control-label">Phone: </label>
                 <div class="col-md-6">
@@ -139,23 +138,9 @@ if($valid){
                 </div>
 	          <span class="red" role="alert">* <?php echo $emailErr;?></span>
             </div>
-			<div class="form-group">
-              <label for="userInput" class="col-md-4 control-label">Username: </label>
-			    <div class="col-md-6">
-                  <input id="userInput" type="text" class="form-control" placeholder="Enter user name" name="username" value="<?php echo $username;?>" maxlength="100">
-                </div>
-	          <span class="red" role="alert">* <?php echo $userErr;?></span>
-            </div>
-			<div class="form-group">
-              <label for="passInput" class="col-md-4 control-label">Password: </label>
-			    <div class="col-md-6">
-                  <input id="passInput" type="password" class="form-control" name="password" value="<?php echo $password;?>" maxlength="100">
-                </div>
-	          <span class="red" role="alert">* <?php echo $passErr;?></span>
-            </div>
             <div class="form-group">
               <div class="col-md-6 col-md-offset-4">
-                <button type="submit" class="btn btn-success">Register</button>
+                <button type="submit" class="btn btn-success">Add new</button>
               </div>
             </div>
             <hr>
@@ -165,5 +150,9 @@ if($valid){
     </div>
   </div>
 </div>
+		
+<?php
+?>
+
 </body>
 </html>

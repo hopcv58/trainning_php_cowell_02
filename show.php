@@ -1,17 +1,14 @@
 <?php
-//ket noi csdl
-$conn = mysql_connect("127.0.0.1", "root", "") or die("can't connect database");
-//chon csdl
-mysql_select_db("training_php",$conn);
-// viet query
-$sql = "SELECT * FROM users WHERE ORDER BY id DESC";
-// thuc thi cau lenh query
-$query = mysql_query($sql);
+require('database/connect.php');
 ?> 
 <table border=1>
 <?php
-	
-	while($row = mysql_fetch_array($query))
+// viet query
+$sql = "SELECT * FROM users ORDER BY id DESC";
+// thuc thi cau lenh query
+$query = mysqli_query($conn, $sql);
+mysqli_close($conn);
+	while($row = mysqli_fetch_array($query))
 		{ 
 			echo "<tr>";
 			echo "<td>".$row['first_name']. "</td>";
